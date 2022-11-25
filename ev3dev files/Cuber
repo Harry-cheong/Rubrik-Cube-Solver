@@ -1,0 +1,154 @@
+#!/usr/bin/env python3
+# pyright: reportMissingImports=false
+
+import time
+# To include: set moves for robot 
+class Cuber():
+    def __init__(self, uss, 
+                        ls,
+                        tilt_motor,
+                        scan_motor,
+                        rotate_motor,
+                        program_manager,
+                        ):
+
+        self.cuberel = []
+
+        # Motors and Sensors
+            # Port Allocation
+            # Red - OUTPUT_A - tilter motor (LargeMotor)
+            # Blue - OUTPUT_B - scanner motor (MediumMotor)
+            # Green - OUTPUT_C - rotate motor (LargeMotor)
+        self.tiltstored = False
+        self.manager = program_manager
+        self.uss = uss
+        self.ls = ls
+        self.tilt_motor = tilt_motor
+        self.scan_motor = scan_motor
+        self.rotate_motor = rotate_motor
+
+    def receive(self, final_moves):
+        self.final_moves = final_moves 
+
+    # Robot Moves
+    def R(self):
+        pass
+
+    def R_prime(self):
+        pass
+
+    def L(self):
+        pass
+
+    def L_prime(self):
+        pass
+
+    def U(self):
+        pass
+
+    def U_prime(self):
+        pass
+
+    def F(self):
+        pass
+
+    def F_prime(self):
+        pass
+
+    def solved(self):
+        self.final_moves = []
+        self.exec_no = 0
+
+    def robot_solve(self):
+        for i in self.final_moves():
+            self.exec_no += 1
+            
+            # Single Moves
+            if i == 'R':
+                self.R()
+
+            elif i == 'R\'':
+                self.R_prime()
+
+            elif i == 'L':
+                self.L()
+
+            elif i == 'L\'':
+                self.L_prime()
+
+            elif i == 'U':
+                self.U()
+            
+            elif i == 'U\'':
+                self.U_prime()
+            
+            elif i == 'F':
+                self.F()
+            
+            elif i == 'F\'':
+                self.F_prime()
+            
+            # Double Moves 
+            elif i == 'R2':
+                self.R()
+                self.R()
+            
+            elif i == 'L2':
+                self.L()
+                self.L()
+
+            elif i == 'U2':
+                self.U()
+                self.U()
+
+            elif i == 'F2':
+                self.F()
+                self.F()
+            
+            else:
+                raise ValueError('Robot Command Invalid' + str(i + 1))
+
+        self.solved()
+    
+    def tface_clock(self):
+        self.rotate_motor.on_for_degrees(40, 320)
+
+    def tface_aclock(self):
+        self.rotate_motor.on_for_degrees(-40, 320)
+
+    def storetilter(self):
+        if not self.tiltstored:
+            self.tilt_motor.on(speed = -50)
+            
+            while not self.tilt_motor.is_stalled:
+                pass
+
+            self.tilt_motor.stop()
+            self.tiltstored = True
+
+    def utilisetilter(self):
+        if self.tiltstored:
+            self.tilt_motor.on_for_degrees(30, 100)
+            self.tiltstored = False
+
+    def cface(self, count):
+        acount = 0
+        while not acount == count:
+            self.tilt_motor.on_for_degrees(70, 90)
+            self.tilt_motor.on_for_degrees(-70, 90)
+            acount += 1
+    
+    def t_clock(self):
+        self.storetilter()
+        self.tface_clock()
+        self.utilisetilter()
+
+    def at_clock(self):
+        self.storetilter()
+        self.tface_aclock()
+        self.utilisetilter()
+            
+
+                
+            
+    

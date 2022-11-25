@@ -1,0 +1,162 @@
+#!/usr/bin/env python3
+# pyright: reportMissingImports=false
+
+import time
+from queue import LifoQueue
+
+class Scanner():
+
+
+    def __init__(self, uss, 
+                        ls,
+                        tilter_motor,
+                        scanner_motor,
+                        rotate_motor,
+                        cuber,
+                        program_manager,
+                        ):
+        self.dbg = 0
+        self.imap = [-1, 0, -1, 6, 12, 18, 24, -1, 39, -1, 36, 42, -1, 48, -1, 54, 60, 66, 72, -1, 78, -1, 84, 90, 96, 102, 108, 114, -1, -1, 120, 126, 132, 138, -1, -1]
+        self.fmap = [0, 1, 2, 3, 4, 5, 0, 3, 2, 1, 5, 4, 0, 4, 2, 5, 3, 1, 0, 5, 2, 4, 1, 3, 1, 0, 3, 2, 5, 4, 1, 2, 3, 0, 4, 5, 1, 4, 3, 5, 0, 2, 1, 5, 3, 4, 2, 0, 2, 1, 0, 3, 5, 4, 2, 3, 0, 1, 4, 5, 2, 4, 0, 5, 1, 3, 2, 5, 0, 4, 3, 1, 3, 0, 1, 2, 4, 5, 3, 2, 1, 0, 5, 4, 3, 4, 1, 5, 2, 0, 3, 5, 1, 4, 0, 2, 4, 0, 5, 2, 1, 3, 4, 1, 5, 3, 2, 0, 4, 2, 5, 0, 3, 1, 4, 3, 5, 1, 0, 2, 5, 0, 4, 2, 3, 1, 5, 1, 4, 3, 0, 2, 5, 4, 0, 1, 3, 5, 3, 4, 1, 2, 0]
+
+        # cuber
+        self.cuber = cuber
+        self.program = program_manager
+
+        # Motors and Sensors
+            # Port Allocation
+            # Red - OUTPUT_A - tilter motor (LargeMotor)
+            # Blue - OUTPUT_B - scanner motor (MediumMotor)
+            # Green - OUTPUT_C - rotate motor (LargeMotor)
+        
+        self.uss = uss
+        self.ls = ls
+        self.tilter_motor = tilter_motor
+        self.scanner_motor = scanner_motor
+        self.rotate_motor = rotate_motor
+
+        # Rubrik Cube Perimeters
+        self.edge0_tab = [1, 7, 5, 3, 43, 31, 23, 35, 21, 11, 19, 17]
+        self.edge1_tab = [29, 41, 9, 33, 15, 47, 45, 27, 25, 39, 37, 13]
+        self.corner0_tab = [2, 0, 6, 4, 16, 22, 20, 18]
+        self.corner1_tab = [28, 40, 8, 32, 44, 24, 36, 12]
+        self.corner2_tab = [34, 30, 42, 10, 14, 46, 26, 38]
+
+        self.index_index = [0, 0, 0]
+
+
+        self.mv_faces = []
+        self.mv_turns = []
+        self.mv_cut = []
+
+        self.turntable_position = 0
+        self.turntable_offset = 24
+        self.pattern_mode = 0
+        self.pattern = 0
+
+        self.scanrgb_delay = 0
+        
+        # Cube
+        self.cube_present = False
+        self.done = False
+
+        # Algorithms
+        self.thistlethwaite = []
+        self.Kociemba = []
+        self.Korf = []
+
+        self.choosen_algorithm = None
+        self.finalmoves = []
+    
+    def Solve_Algorithm(self):
+        # Solver - To learn
+        # SolverResponse - decode solving info from algorithm
+        # GetPattern - Determine all the faces of the cube
+        # SetPattern - ??
+        pass
+
+    def detect_cube(self):
+        if 6<int(self.uss.distance_centimeters)<10:
+            self.cube_present = True
+
+    def scanRGB(self):
+        time.sleep(self.scanrgb_delay/1000)
+        red = self.ls.red
+        blue = self.ls.blue
+        green = self.ls.green
+        if not red + blue + green >= 0:
+            self.scanrgb_delay = (self.scanrgb_delay+1)%20
+            return red, blue, green
+        return red, blue, green
+    
+    def jamm_detection(self, motor, refresh_rate = 0.1, arb_jam_constant = 50):
+        if motor != 'A' or 'B':
+            raise ValueError('Motor Invalid')
+        
+        if motor == 'A':
+            moi = self.scan_motor
+        else:
+            moi = self.tilt_motor
+        
+        init_pos = final_pos = 0 
+        moi.run_direct(speed = 70)
+        time.sleep(0.3)
+        while not (final_pos - init_pos) > arb_jam_constant: 
+            init_pos = moi.position
+            time.sleep(refresh_rate)
+            final_pos = moi.position 
+    
+    def collect_sm_data(self, data_rate = 0.1, ref_data_size = 20, exp_duration = 20):
+        
+        while True:
+
+            stack = LifoQueue(maxsize = ref_data_size)
+
+            self.leds.set_color('LEFT','ORANGE')
+            self.leds.set_color('RIGHT','ORANGE') 
+
+            while not self.btn.enter():
+                pass
+            
+            self.leds.set_color('LEFT', 'GREEN')
+            self.leds.set_color('RIGHT', 'GREEN')
+
+            init_time = final_time = time.perf_counter()
+            time_elapsed = 0
+
+            while not time_elapsed >= exp_duration:
+                stack.put((self.scan_motor.position, self.ls.color))
+                time.sleep(data_rate)
+                final_time = time.perf_counter()
+            
+            print(stack)
+
+    def scancubeface(self):
+        pass
+
+
+    def CalscanRGB(self):
+        init_pos = self.scan_motor.position
+        self.scan_motor.run_direct(speed = -70)
+        count = 0
+        while not count > 10:
+            count += 1
+            self.scanRGB()
+        self.scan_motor.move_for_degrees(speed = 75, degrees = self.turntable_position - (self.scan_motor.position - init_pos))
+
+    def CubeAbsent(self):
+        self.program.program_seq(command = 'Remove Cube', seq = False)
+        start_time = end_time = time.perf_counter()
+
+        while (end_time - start_time) > 2:
+            if not self.detect_cube():
+                end_time = time.perf_counter()
+    
+    def CubePresent(self):
+        self.program.program_seq(command = 'Insert Cube', seq = False)
+        start_time = end_time = time.perf_counter()
+        while (end_time - start_time) > 2:
+            if self.detect_cube():
+                end_time = time.perf_counter()
+        self.done = True
+    

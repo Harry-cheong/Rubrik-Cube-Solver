@@ -1,0 +1,136 @@
+#!/usr/bin/env python3
+# pyright: reportMissingImports=false
+
+class Solver:
+    def __init__(self, uss, 
+                        ls,
+                        tilter_motor,
+                        scanner_motor,
+                        rotate_motor,
+                        leds,
+                        btn,
+                        program):
+    
+    # LEDS, btn
+        self.leds = leds
+        self.btn = btn
+
+        # Motors and Sensors
+            # Port Allocation
+            # Red - OUTPUT_A - tilter motor (LargeMotor)
+            # Blue - OUTPUT_B - scanner motor (MediumMotor)
+            # Green - OUTPUT_C - rotate motor (LargeMotor)
+        
+        self.uss = uss
+        self.ls = ls
+        self.tilter_motor = tilter_motor
+        self.scanner_motor = scanner_motor
+        self.rotate_motor = rotate_motor  
+
+        # Algorithms
+        self.thistlethwaite = []
+        self.Kociemba = []
+        self.Korf = []
+
+        self.choosen_algorithm = None
+        self.finalmoves = []
+
+            # Cube 'Simulation' 
+
+    def init_cube(self):
+                # Rubrik Cube faces
+        self.red_face = ['R', 'R', 'R',
+                        'R', 'R', 'R',
+                        'R', 'R', 'R'] 
+        
+        self.yellow_face = ['Y', 'Y', 'Y',
+                            'Y', 'Y', 'Y',
+                            'Y', 'Y', 'Y']
+        
+        self.white_face = ['W', 'W', 'W',
+                            'W', 'W', 'W',
+                            'W', 'W', 'W']
+        
+        self.green_face = ['G', 'G', 'G',
+                            'G', 'G', 'G',
+                            'G', 'G', 'G']
+        
+        self.blue_face = ['B', 'B', 'B',
+                            'B', 'B', 'B',
+                            'B', 'B', 'B']
+        
+        self.orange_face = ['O', 'O', 'O',
+                            'O', 'O', 'O',
+                            'O', 'O', 'O']
+
+        self.face_rel = [('R', 'O'),
+                         ('G', 'B'),
+                         ('W', 'Y')]
+    def sR(self):
+        pass
+
+    def sR_prime(self):
+        pass
+
+    def sL(self):
+        pass
+
+    def sL_prime(self):
+        pass
+
+    def sU(self):
+        pass
+
+    def sU_prime(self):
+        pass
+
+    def sF(self):
+        pass
+
+    def sF_prime(self):
+        pass
+
+    # Thistlethwaite's algorithm, Kociemba's Algorithm, korf’s algorithm
+
+    def Thistlethwaite(self):
+        if self.input_faces == []:
+            raise ValueError('No Input face')
+
+    def Kociemba(self):
+        if self.input_faces == []:
+            raise ValueError('No Input face')
+
+    def Korf(self):
+        if self.input_faces == []:
+            raise ValueError('No Input face')
+
+    def restart(self):
+        self.choosen_algorithm = None
+        self.final_moves = self.Korf = self.Kociemba = self.thistlethwaite = []
+    
+    def compute_least_moves(self):
+        self.restart()
+        self.Thistlethwaite()
+        self.Kociemba()
+        self.Korf()
+
+        compare_moves = []
+        compare_moves.append(len(self.thistlethwaite))
+        compare_moves.append(len(self.Kociemba))
+        compare_moves.append(len(self.Korf))
+        index = index(max(compare_moves))
+        if index == 1:
+            self.choosen_algorithm = 'Thistlethwaite'
+            self.final_moves = self.thistlethwaite
+        elif index == 2: 
+            self.choosen_algorithm = 'Kociemba'
+            self.final_moves = self.Kociemba
+        elif index == 3:
+            self.choosen_algorithm = 'Korf'
+            self.final_moves = self.Korf
+
+        return self.choosen_algorithm, self.final_moves
+
+
+                
+

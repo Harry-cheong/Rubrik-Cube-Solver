@@ -1,0 +1,91 @@
+#!/usr/bin/env python3
+# pyright: reportMissingImports=false
+from ev3dev2.motor import OUTPUT_A, OUTPUT_B,OUTPUT_C, MoveTank, MoveSteering, LargeMotor, MediumMotor, SpeedPercent
+from ev3dev2.led import Leds
+from ev3dev2.button import Button
+from ev3dev2.sound import Sound
+from ev3dev2.sensor.lego import ColorSensor, UltrasonicSensor 
+from ev3dev2.sensor import INPUT_1, INPUT_2
+from ev3dev2.display import Display
+import ev3dev2.fonts as fonts
+import time
+from queue import LifoQueue
+from importlib.machinery import SourceFileLoader
+
+# Load Modules
+Cuber = SourceFileLoader('Cuber', "/home/robot/Rubrik-Cube-Solver/ev3dev files/Cuber").load_module()
+Scanner = SourceFileLoader('Scanner', "/home/robot/Rubrik-Cube-Solver/ev3dev files/Scanner").load_module()
+# com = SourceFileLoader('MQTT', "/home/robot/Rubrik-Cube-Solver/ev3dev files/MQTT").load_module()
+
+# Motors and Sensors
+rotate_motor = LargeMotor(OUTPUT_A)
+scan_motor = MediumMotor(OUTPUT_B)
+tilt_motor = LargeMotor(OUTPUT_C)
+
+uss = UltrasonicSensor(INPUT_2)
+ls = ColorSensor(INPUT_1)
+ls.mode = 'COL-REFLECT'
+spk = Sound()
+leds = Leds()
+btn = Button()
+
+# Global Variables 
+bit_offset = 12
+set_jamdegrees = 40
+
+class Program():
+    def __init__(self):
+        self.programseq = 0
+
+    def Banner(self):
+        spk.speak('Robot Built from David Gilday')
+        spk.speak('Programmed by Harry')
+
+    def programseq(self, command =  None, seq = True):
+        self.program_seq
+        if command is not None:
+            if type(command) != str:
+                try:
+                    spk.speak(str(command))
+                except: 
+                    print('Invalid Command Given')
+            else:
+                spk.speak(command)
+        if seq:
+            spk.speak(str(self.program_seq))
+            self.program_seq += 1
+    def pause(self):
+        # Execution starts here
+        leds.set_color('LEFT','RED')
+        leds.set_color('RIGHT','RED') 
+
+        # program_manager.Banner()
+        while not btn.enter:
+            pass
+
+        leds.set_color('LEFT', 'GREEN')
+        leds.set_color('RIGHT', 'GREEN')
+
+# Init Classes
+program_manager = Program()
+
+cuber = Cuber.Cuber(
+    uss, 
+    ls,
+    tilt_motor,
+    scan_motor,
+    rotate_motor,
+    program_manager)
+
+scanner = Scanner.Scanner(
+    uss, 
+    ls,
+    tilt_motor,
+    scan_motor,
+    rotate_motor,
+    cuber,
+    program_manager,)
+
+# com = com()
+
+# Execution starts here
