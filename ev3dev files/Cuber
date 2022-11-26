@@ -9,6 +9,8 @@ class Cuber():
                         tilt_motor,
                         scan_motor,
                         rotate_motor,
+                        leds,
+                        btn,
                         program_manager,
                         ):
 

@@ -26,7 +26,7 @@ class Solver:
         self.tilter_motor = tilter_motor
         self.scanner_motor = scanner_motor
         self.rotate_motor = rotate_motor  
-
+        
         # Algorithms
         self.thistlethwaite = []
         self.Kociemba = []

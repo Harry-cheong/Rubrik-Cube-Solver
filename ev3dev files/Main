@@ -75,6 +75,8 @@ cuber = Cuber.Cuber(
     tilt_motor,
     scan_motor,
     rotate_motor,
+    leds,
+    btn,
     program_manager)
 
 scanner = Scanner.Scanner(
@@ -83,9 +85,22 @@ scanner = Scanner.Scanner(
     tilt_motor,
     scan_motor,
     rotate_motor,
+    leds,
+    btn,
     cuber,
     program_manager,)
 
+# Code to reset rubrik cube solver
+cuber.storetilter()
+
+scan_motor.on(speed = 50)
+while not scan_motor.is_stalled:
+    pass
+scan_motor.off()
+
+program_manager.pause()
 # com = com()
 
+scanner.log_face()
+scanner.collect_sm_data()
 # Execution starts here
